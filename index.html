@@ -604,12 +604,14 @@ function computeMatch(funder, merchant){
 
 function showDetails(name){
   const funder = funders.find(f => f.name === name);
-  if(!funder) return;
+  if(!funder) {
+    console.error('Funder not found:', name);
+    return;
+  }
 
-  const existing = document.getElementById('funderModalBackdrop');
-  if(existing) existing.remove();
+  closeModal();
 
-  const emailList = funder.emails.length
+  const emailList = funder.emails && funder.emails.length
     ? funder.emails.map(email => `<div>${email}</div>`).join('')
     : '<div class="small-muted">No direct emails listed for this funder.</div>';
 
@@ -617,13 +619,13 @@ function showDetails(name){
   modal.className = 'modal-backdrop';
   modal.id = 'funderModalBackdrop';
   modal.innerHTML = `
-    <div class="modal-card">
+    <div class="modal-card" onclick="event.stopPropagation()">
       <div class="modal-top">
         <div>
           <h3>${funder.name}</h3>
           <div class="modal-sub">Full funder details, restrictions, and submission contacts.</div>
         </div>
-        <button class="close-btn" onclick="closeModal()">Close</button>
+        <button type="button" class="close-btn" onclick="closeModal()">Close</button>
       </div>
 
       <div class="detail-grid">
@@ -648,14 +650,22 @@ function showDetails(name){
         <div class="k">Submission Emails</div>
         <div class="email-list">${emailList}</div>
         <div class="email-actions">
-          <button class="copy-btn" id="copyEmailsBtn" onclick='copyEmails(${JSON.stringify(funder.emails)})'>Copy Emails</button>
-          <div class="small-muted">Copies emails with spaces only, no commas.</div>
+          <button type="button" class="copy-btn" id="copyEmailsBtn">Copy Emails</button>
+          <div class="small-muted">Copies all listed emails to your clipboard with spaces only, no commas.</div>
         </div>
       </div>
     </div>
   `;
-  modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+
+  modal.addEventListener('click', closeModal);
   document.body.appendChild(modal);
+
+  const copyBtn = document.getElementById('copyEmailsBtn');
+  if(copyBtn){
+    copyBtn.addEventListener('click', function(){
+      copyEmails(funder.emails || []);
+    });
+  }
 }
 
 function closeModal(){
@@ -664,16 +674,47 @@ function closeModal(){
 }
 
 function copyEmails(emails){
-  if(!emails || !emails.length){ return; }
+  if(!emails || !emails.length){
+    alert('No emails listed for this funder.');
+    return;
+  }
+
   const text = emails.join(' ');
-  navigator.clipboard.writeText(text).then(() => {
+
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyEmailsBtn');
+      if(btn){
+        const original = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => { btn.textContent = original; }, 1400);
+      }
+    }).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text){
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  try {
+    document.execCommand('copy');
     const btn = document.getElementById('copyEmailsBtn');
     if(btn){
       const original = btn.textContent;
       btn.textContent = 'Copied';
-      setTimeout(() => btn.textContent = original, 1400);
+      setTimeout(() => { btn.textContent = original; }, 1400);
     }
-  });
+  } catch (err) {
+    alert('Copy failed. Please copy the emails manually.');
+  }
+  document.body.removeChild(textarea);
 }
 
 function resetForm(){
@@ -720,7 +761,7 @@ function runMatch(){
     return `
       <div class="result-card ${statusClass}">
         <div class="result-top">
-          <button class="linklike" onclick="showDetails(this.dataset.name)" data-name="${item.funder.name.replace(/"/g, '&quot;')}">${item.funder.name}</button>
+          <button type="button" class="linklike" data-name="${item.funder.name.replace(/"/g, '&quot;')}" onclick="showDetails(this.getAttribute('data-name'))">${item.funder.name}</button>
           <div class="pill ${statusClass}">${statusText}</div>
         </div>
         <div class="result-sub">${reasonText}</div>
