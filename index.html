@@ -720,7 +720,7 @@ function runMatch(){
     return `
       <div class="result-card ${statusClass}">
         <div class="result-top">
-          <button class="linklike" onclick="showDetails(${JSON.stringify(item.funder.name)})">${item.funder.name}</button>
+          <button class="linklike" onclick="showDetails(this.dataset.name)" data-name="${item.funder.name.replace(/"/g, '&quot;')}">${item.funder.name}</button>
           <div class="pill ${statusClass}">${statusText}</div>
         </div>
         <div class="result-sub">${reasonText}</div>
