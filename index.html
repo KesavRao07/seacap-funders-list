@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SeaCap MCA Funder Routing Tool</title>
+<style>
+:root{
+  --sea-shell:#C7D8CD;
+  --ocean-mist:#648F89;
+  --sea-green:#195455;
+  --slate:#0D2223;
+  --grey:#B0BBBA;
+  --white:#F5F7F7;
+  --panel:#12393b;
+  --panel-2:#153f41;
+  --line:rgba(199,216,205,0.16);
+  --line-strong:rgba(199,216,205,0.28);
+  --shadow:0 24px 60px rgba(7,20,21,0.35);
+  --success:#65d19e;
+  --danger:#ff7c7c;
+  --glow:0 0 0 4px rgba(100,143,137,0.18);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color:var(--white);
+  background:
+    radial-gradient(circle at top left, rgba(100,143,137,0.28), transparent 28%),
+    radial-gradient(circle at top right, rgba(25,84,85,0.35), transparent 22%),
+    linear-gradient(180deg, #0c2324 0%, #102e30 100%);
+  min-height:100vh;
+}
+.container{
+  max-width:1380px;
+  margin:0 auto;
+  padding:36px 28px 48px;
+}
+.header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:24px;
+  margin-bottom:28px;
+}
+.brand-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 12px;
+  border:1px solid var(--line);
+  background:rgba(199,216,205,0.05);
+  border-radius:999px;
+  color:var(--sea-shell);
+  font-size:12px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.dot{
+  width:8px;height:8px;border-radius:999px;background:linear-gradient(135deg,var(--sea-shell),var(--ocean-mist));
+  box-shadow:0 0 18px rgba(199,216,205,0.45);
+}
+h1{
+  margin:16px 0 8px;
+  font-size:clamp(34px, 5vw, 56px);
+  line-height:1.02;
+  letter-spacing:-0.04em;
+  font-weight:800;
+}
+.subtitle{
+  margin:0;
+  color:rgba(245,247,247,0.72);
+  max-width:760px;
+  line-height:1.6;
+  font-size:15px;
+}
+.header-card{
+  min-width:270px;
+  padding:16px 18px;
+  border-radius:22px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(199,216,205,0.08), rgba(100,143,137,0.08));
+  box-shadow:var(--shadow);
+}
+.header-card .label{color:rgba(245,247,247,0.65);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.header-card .value{margin-top:6px;font-size:20px;font-weight:700}
+.layout{
+  display:grid;
+  grid-template-columns: 470px minmax(0, 1fr);
+  gap:24px;
+  align-items:start;
+}
+.card{
+  position:relative;
+  border-radius:30px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(18,57,59,0.96), rgba(13,34,35,0.96));
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, rgba(199,216,205,0.05), transparent 22%);
+  pointer-events:none;
+}
+.form-card{padding:30px 30px 26px; position:sticky; top:18px}
+.results-card{padding:28px}
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:24px;
+}
+.section-head h2{
+  margin:0;
+  font-size:20px;
+  letter-spacing:-0.02em;
+}
+.section-head p{
+  margin:6px 0 0;
+  font-size:13px;
+  color:rgba(245,247,247,0.65);
+}
+.badge{
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(199,216,205,0.08);
+  border:1px solid var(--line);
+  color:var(--sea-shell);
+  font-size:12px;
+  white-space:nowrap;
+}
+.form-grid{display:grid; gap:18px}
+.field{display:grid; gap:9px}
+label{
+  font-size:13px;
+  font-weight:700;
+  color:var(--sea-shell);
+  letter-spacing:.02em;
+}
+.input-wrap{position:relative}
+input,select{
+  width:100%;
+  appearance:none;
+  border:1px solid rgba(199,216,205,0.16);
+  background:linear-gradient(180deg, rgba(245,247,247,0.98), rgba(239,244,243,0.96));
+  color:var(--slate);
+  border-radius:18px;
+  padding:16px 18px;
+  font-size:17px;
+  font-weight:600;
+  outline:none;
+  transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+}
+input::placeholder{color:#6f7e7d}
+input:focus,select:focus{
+  border-color:rgba(100,143,137,0.9);
+  box-shadow:var(--glow);
+  transform:translateY(-1px);
+}
+.select-wrap::after{
+  content:"⌄";
+  position:absolute;
+  right:18px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--sea-green);
+  font-size:20px;
+  pointer-events:none;
+}
+.input-hint{
+  font-size:12px;
+  color:rgba(245,247,247,0.5);
+  margin-top:2px;
+}
+.actions{
+  display:grid;
+  grid-template-columns:1fr 130px;
+  gap:12px;
+  margin-top:8px;
+}
+button{
+  border:none;
+  border-radius:18px;
+  padding:16px 18px;
+  font-weight:800;
+  font-size:15px;
+  cursor:pointer;
+  transition:transform .18s ease, filter .18s ease, opacity .18s ease;
+}
+button:hover{transform:translateY(-1px)}
+button:active{transform:translateY(0)}
+.primary{
+  color:var(--white);
+  background:linear-gradient(135deg, var(--ocean-mist), var(--sea-green));
+  box-shadow:0 16px 28px rgba(8,31,32,0.28);
+}
+.secondary{
+  color:var(--sea-shell);
+  background:rgba(199,216,205,0.07);
+  border:1px solid var(--line);
+}
+.summary-row{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+.summary-tile{
+  padding:16px 16px 14px;
+  border-radius:20px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(199,216,205,0.08), rgba(199,216,205,0.03));
+}
+.summary-tile .small{
+  color:rgba(245,247,247,0.58);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.summary-tile .big{
+  margin-top:8px;
+  font-size:26px;
+  font-weight:800;
+  letter-spacing:-0.03em;
+}
+.results-list{display:grid; gap:14px}
+.result-card{
+  position:relative;
+  padding:18px 18px 16px 18px;
+  border-radius:22px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(10,28,29,0.72), rgba(12,35,36,0.84));
+  overflow:hidden;
+}
+.result-card::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;width:5px;
+}
+.result-card.good::before{background:linear-gradient(180deg, #7fe0ab, #4ac385)}
+.result-card.bad::before{background:linear-gradient(180deg, #ff9e9e, #ff6868)}
+.result-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+.result-top a, .result-top button.linklike{
+  color:var(--white);
+  text-decoration:none;
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:-0.03em;
+  background:none;
+  border:none;
+  padding:0;
+  text-align:left;
+}
+.result-top a:hover, .result-top button.linklike:hover{opacity:.86; transform:none}
+.pill{
+  font-size:12px;
+  border-radius:999px;
+  padding:8px 10px;
+  font-weight:700;
+  border:1px solid var(--line);
+}
+.pill.good{background:rgba(101,209,158,0.12); color:#9df3c1}
+.pill.bad{background:rgba(255,124,124,0.12); color:#ffb1b1}
+.result-sub{
+  margin-top:8px;
+  color:rgba(245,247,247,0.78);
+  font-size:14px;
+  line-height:1.45;
+}
+.result-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+.meta-chip{
+  border:1px solid rgba(199,216,205,0.12);
+  background:rgba(199,216,205,0.05);
+  color:rgba(245,247,247,0.7);
+  padding:8px 10px;
+  border-radius:999px;
+  font-size:12px;
+}
+.empty{
+  min-height:460px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  border:1px dashed rgba(199,216,205,0.18);
+  border-radius:24px;
+  color:rgba(245,247,247,0.56);
+  background:rgba(199,216,205,0.03);
+}
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(4,12,13,0.72);
+  backdrop-filter: blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  z-index:9999;
+}
+.modal-card{
+  width:min(860px, 100%);
+  max-height:88vh;
+  overflow:auto;
+  border-radius:28px;
+  border:1px solid var(--line-strong);
+  background:linear-gradient(180deg, rgba(18,57,59,0.98), rgba(13,34,35,0.98));
+  box-shadow:0 28px 80px rgba(0,0,0,0.45);
+  padding:28px;
+}
+.modal-top{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:flex-start;
+  margin-bottom:22px;
+}
+.modal-top h3{
+  margin:0;
+  font-size:34px;
+  letter-spacing:-0.04em;
+}
+.modal-sub{
+  margin:8px 0 0;
+  color:rgba(245,247,247,0.64);
+}
+.close-btn{
+  background:rgba(199,216,205,0.08);
+  color:var(--sea-shell);
+  border:1px solid var(--line);
+  width:auto;
+}
+.detail-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:12px;
+}
+.detail-card{
+  border:1px solid var(--line);
+  background:rgba(199,216,205,0.05);
+  border-radius:20px;
+  padding:15px;
+}
+.detail-card .k{
+  color:rgba(245,247,247,0.55);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.detail-card .v{
+  margin-top:8px;
+  line-height:1.5;
+  font-size:15px;
+}
+.email-block{
+  margin-top:18px;
+  padding:18px;
+  border-radius:22px;
+  border:1px solid var(--line);
+  background:rgba(199,216,205,0.05);
+}
+.email-list{
+  margin-top:10px;
+  display:grid;
+  gap:8px;
+  color:var(--sea-shell);
+  word-break:break-word;
+}
+.email-actions{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap}
+.copy-btn{background:linear-gradient(135deg, var(--ocean-mist), var(--sea-green)); color:var(--white)}
+.small-muted{color:rgba(245,247,247,0.56); font-size:13px}
+@media (max-width: 1100px){
+  .layout{grid-template-columns:1fr;}
+  .form-card{position:relative; top:0}
+}
+@media (max-width: 760px){
+  .container{padding:22px 14px 32px}
+  .header{flex-direction:column; align-items:flex-start}
+  .summary-row, .detail-grid, .actions{grid-template-columns:1fr}
+  h1{font-size:34px}
+  .form-card,.results-card,.modal-card{padding:20px}
+  .result-top{align-items:flex-start; flex-direction:column}
+  .result-top a, .result-top button.linklike{font-size:20px}
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <div class="brand-kicker"><span class="dot"></span> SeaCap Internal Routing Portal</div>
+        <h1>MCA Funder Routing Tool</h1>
+        <p class="subtitle">Match a merchant file against your funder matrix, review eligibility instantly, and click into each funder for full details, notes, and copy-ready submission emails.</p>
+      </div>
+      <div class="header-card">
+        <div class="label">Use Case</div>
+        <div class="value">Ops Manager Workflow</div>
+        <div class="small-muted" style="margin-top:8px">Built for quick routing, cleaner decisions, and faster submissions.</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="card form-card">
+        <div class="section-head">
+          <div>
+            <h2>Merchant Info</h2>
+            <p>Enter the file basics and run the match.</p>
+          </div>
+          <div class="badge">7 required fields</div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="revenue">Monthly Revenue</label>
+            <div class="input-wrap"><input id="revenue" type="number" placeholder="e.g. 50000" /></div>
+          </div>
+
+          <div class="field">
+            <label for="amount">Amount Requested</label>
+            <div class="input-wrap"><input id="amount" type="number" placeholder="e.g. 40000" /></div>
+          </div>
+
+          <div class="field">
+            <label for="industry">Industry</label>
+            <div class="input-wrap select-wrap">
+              <select id="industry">
+                <option>Retail</option>
+                <option>Restaurant</option>
+                <option>Construction</option>
+                <option>Trucking</option>
+                <option>Auto Sales</option>
+                <option>Medical</option>
+                <option>Professional Services</option>
+                <option>Beauty</option>
+                <option>Wholesale</option>
+                <option>Ecommerce</option>
+                <option>Financial Services</option>
+                <option>Real Estate</option>
+                <option>Nonprofit</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="tib">Time In Business (months)</label>
+            <div class="input-wrap"><input id="tib" type="number" placeholder="e.g. 18" /></div>
+          </div>
+
+          <div class="field">
+            <label for="fico">Credit Score</label>
+            <div class="input-wrap"><input id="fico" type="number" placeholder="e.g. 625" /></div>
+          </div>
+
+          <div class="field">
+            <label for="state">State</label>
+            <div class="input-wrap"><input id="state" type="text" placeholder="e.g. NJ" maxlength="2" /></div>
+            <div class="input-hint">Use 2-letter abbreviation</div>
+          </div>
+
+          <div class="field">
+            <label for="positions">Existing Positions</label>
+            <div class="input-wrap"><input id="positions" type="number" placeholder="e.g. 2" /></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" onclick="runMatch()">Find Funders</button>
+          <button class="secondary" onclick="resetForm()">Reset</button>
+        </div>
+      </div>
+
+      <div class="card results-card">
+        <div class="section-head">
+          <div>
+            <h2>Results</h2>
+            <p>Eligible and non-eligible funders with instant detail view.</p>
+          </div>
+          <div class="badge" id="resultsBadge">No search yet</div>
+        </div>
+
+        <div class="summary-row">
+          <div class="summary-tile">
+            <div class="small">Eligible</div>
+            <div class="big" id="eligibleCount">0</div>
+          </div>
+          <div class="summary-tile">
+            <div class="small">Not Eligible</div>
+            <div class="big" id="ineligibleCount">0</div>
+          </div>
+          <div class="summary-tile">
+            <div class="small">Funders Loaded</div>
+            <div class="big" id="totalCount">0</div>
+          </div>
+        </div>
+
+        <div id="results" class="empty">
+          <div>
+            <div style="font-size:20px;font-weight:800;color:var(--sea-shell);margin-bottom:8px">Run a merchant search</div>
+            <div>Once you click <b>Find Funders</b>, the portal will return eligible matches and show why a funder did or did not fit.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const funders = [
+  {name:"Aspire Funding Platform",minRevenue:10000,minTIB:12,minFico:0,maxPositions:5,maxDeal:500000,badIndustries:["Gambling","Casino","Poker","Sportsbook","Betting","Wagering","Lottery","CBD","Cannabis","Vape","Smoke Shops","Firearms","Adult Entertainment","Crypto"],badStates:[],emails:["submissions@aspirefundingplatform.com","adam@aspirefundingplatform.com","amoffers@aspirefundingplatform.com","svasquez@aspirefundingplatform.com","kesav@aspirefundingplatform.com","amiz@aspirefundingplatform.com","info@aspirefundingplatform.com","offers@aspirefundingplatform.com","elig@aspirefundingplatform.com","angelo@aspirefundingplatform.com","dflores@aspirefundingplatform.com"],term:"Up to 48 Weeks / 240 Days",commission:"12 Points",buyRate:"Not Specified",notes:"Restricted industries include gambling, CBD/cannabis, vape, smoke shops, firearms, adult entertainment, counterfeit goods, crypto-related activity, and illicit-market activity."},
+  {name:"Forest Capital",minRevenue:50000,minTIB:12,minFico:0,maxPositions:12,maxDeal:1000000,badIndustries:["Lawyers","Trucking","Auto Sales"],badStates:["NY","CA"],emails:["submissions@forestcapitalgrp.com","aliza@forestcapitalgrp.com","steve@forestcapitalgrp.com"],term:"60–140 Days",commission:"12 Points",buyRate:"1.37–1.499",notes:"No NY or CA. No reverse until deposits are cleared. Early payoff cuts commission."},
+  {name:"FYNCAP",minRevenue:30000,minTIB:12,minFico:0,maxPositions:99,maxDeal:500000,badIndustries:[],badStates:[],emails:["mross@fyncap.com","fyncap@fyncap.com","val@fyncap.com","submissions@fyncap.com"],term:"2–10 Months",commission:"12 Points",buyRate:"1.28–1.40",notes:"Auto-decline: MCA recovery, child support issues, non-citizens. Strict docs. High-risk industries require extra proof. No stated FICO minimum."},
+  {name:"Amsterdam Capital Group",minRevenue:30000,minTIB:12,minFico:500,maxPositions:99,maxDeal:9999999,badIndustries:["Nonprofit","Real Estate","Medical","Financial Services","Auto Sales"],badStates:["CA","UT","TX"],emails:[],term:"Up to 10 months standard / 7 months high risk",commission:"12 Points",buyRate:"Not Specified",notes:"Prefers 2nd–3rd position. Declines NY wholesale. Special rules for trucking, construction, daycare, home healthcare, landscaping, and nail salons."},
+  {name:"Bitty",minRevenue:25000,minTIB:6,minFico:500,maxPositions:3,maxDeal:250000,badIndustries:["Financial Services","Nonprofit","Gambling"],badStates:[],emails:[],term:"3–12 months",commission:"Not Specified",buyRate:"Not Specified",notes:"Apply using portal. Prohibited industries include bail bonds, crypto, debt collections, gambling, supplements, money service businesses, not-for-profits, psychic services, religious organizations, and sexual content businesses."},
+  {name:"CFG Merchant Solutions (CFGMS)",minRevenue:10000,minTIB:0,minFico:0,maxPositions:5,maxDeal:200000,badIndustries:["Nonprofit"],badStates:[],emails:[],term:"Not Specified",commission:"Not Specified",buyRate:"As low as 1.30s",notes:"Focuses on 2nd through 4th/5th positions. 1st position only if strong monthly deposits and prior MCA history. Avoid trucking and construction unless revenue exceeds $50k/month. No defaulted merchants or merchants in reverse."},
+  {name:"Cromwell Capital",minRevenue:60000,minTIB:12,minFico:0,maxPositions:99,maxDeal:3000000,badIndustries:["Auto Sales","Trucking","Financial Services"],badStates:["NY","HI"],emails:[],term:"Not Specified",commission:"Not Specified",buyRate:"7% funding fee",notes:"No previous defaults. TX only allowed for fundings $75k+. Weekly payment structure available. Manual logins required. Contact: Eric Dabakarov (917-902-3273)."},
+  {name:"Everest Business Funding",minRevenue:3000,minTIB:4,minFico:550,maxPositions:4,maxDeal:500000,badIndustries:["Financial Services","Auto Sales","Lawyers"],badStates:[],emails:["zahria.davis@everestbusinessfunding.com","isosupport@everestbusinessfunding.com","submissions@everestbusinessfunding.com"],term:"4–18 months",commission:"Up to 15 pts",buyRate:"1.27+",notes:"Min advance $2,600. Max 10 negative days/month and 10 NSFs/month. Requires 3 months of business bank statements."},
+  {name:"Vader Capital",minRevenue:10000,minTIB:1,minFico:500,maxPositions:4,maxDeal:15000,badIndustries:["Adult Entertainment","Gambling","Firearms"],badStates:[],emails:["isosupport@vadermountaincapital.com","submissions@vadermountaincapital.com"],term:"Up to 105 Days",commission:"Up to 12 points",buyRate:"1.35+",notes:"Evaluates overall file strength including revenue consistency, bank activity, and stacking. Excessive NSFs, declining revenue, or heavy debt load may reduce approval."},
+  {name:"Fox Funding",minRevenue:50000,minTIB:12,minFico:500,maxPositions:5,maxDeal:1500000,badIndustries:["Nonprofit"],badStates:[],emails:[],term:"Up to 12 months",commission:"10 points (2–1 ratio up to 12)",buyRate:"1.28–1.33 regular / 1.36–1.39 high-risk",notes:"Special NY/CA rules: 600+ FICO, $200k minimum revenue, $100k minimum funding, max 4th position, no high-risk deals or high-risk positions. Auto sales and trucking get tighter after 4th position."},
+  {name:"Fratello Capital",minRevenue:20000,minTIB:6,minFico:0,maxPositions:6,maxDeal:350000,badIndustries:["Trucking"],badStates:[],emails:["Underwriting@fratellocapital.com"],term:"12 weeks to 48 weeks depending on product",commission:"Not Specified",buyRate:"Not Specified",notes:"Funds B–C paper. Construction and auto sales usually need $50k revenue. Allows prior defaults, judgments, and open bankruptcies. Max 5 negative days per month."},
+  {name:"Loot",minRevenue:10000,minTIB:12,minFico:0,maxPositions:3,maxDeal:100000,badIndustries:["Nonprofit","Trucking","Auto Sales","Construction","Adult Entertainment","Financial Services"],badStates:["TX"],emails:["apps@getloot.com","partners@getloot.com"],term:"3, 4, or 5 months",commission:"Up to 10%",buyRate:"1.33–1.50",notes:"LOC product. Minimum $3k ADB and fewer than 4 negative days/month required. Plaid connection required for closing."},
+  {name:"Highland Hill (Reverse)",minRevenue:30000,minTIB:12,minFico:500,maxPositions:8,maxDeal:1000000,badIndustries:["Lawyers","Financial Services"],badStates:["CA","VA"],emails:["tristan@highlandhillcap.com","glenn@highlandhillcap.com","uw@highlandhillcap.com","charles@highlandhillcap.com","submissions@highlandhillcap.com"],term:"Up to 120 days",commission:"Aggressive commissions",buyRate:"Not Specified",notes:"No 1st positions. Strong for stacking, reverse consolidations, high-risk B–D paper, and large deals. Trucking usually needs $100k+ monthly deposits. Canada not allowed."},
+  {name:"InstaFunders",minRevenue:100000,minTIB:12,minFico:500,maxPositions:99,maxDeal:2500000,badIndustries:["Trucking","Auto Sales","Nonprofit","Financial Services","Lawyers"],badStates:["UT","NY","CT"],emails:["instasubs@instafunders.com"],term:"Up to 10 months",commission:"Up to 12 points",buyRate:"1.32–1.37",notes:"Requires at least 5 monthly deposits and max average of 5 negative days per month. 2nd position and above."},
+  {name:"IOU Financial",minRevenue:10000,minTIB:12,minFico:650,maxPositions:99,maxDeal:600000,badIndustries:["Adult Entertainment","Financial Services","Lawyers","Construction","Trucking","Gambling","Nonprofit","Real Estate","Auto Sales","Vape"],badStates:["RI","MT","NV","SD","ND","VT","HI"],emails:[],term:"6–24 months",commission:"Not Specified",buyRate:"Not Specified",notes:"Needs minimum $10k deposits and $3k ADB. Very large restricted-industry list. Miami-Dade also restricted."},
+  {name:"Itria / Biz2Credit",minRevenue:40000,minTIB:24,minFico:640,maxPositions:99,maxDeal:9999999,badIndustries:["Adult Entertainment","Lawyers","Cannabis","Construction","Real Estate","Auto Sales","Crypto"],badStates:[],emails:["Tommy.Quinones@biz2credit.com"],term:"10–18 months",commission:"3 to 6 points depending on origination fee",buyRate:"1.22–1.32",notes:"Max 4 NSFs in last 3 months. Trucking only if contracted with FedEx/Amazon/UPS. General construction restricted unless specialty trade."},
+  {name:"Jaffe Capital",minRevenue:20000,minTIB:6,minFico:0,maxPositions:99,maxDeal:500000,badIndustries:["Adult Entertainment","Gambling","Financial Services"],badStates:["PR"],emails:["yuda@jaffecapital.com","submissions@jaffecapital.com"],term:"Up to 12 months",commission:"Not Specified",buyRate:"Not Specified",notes:"Focuses on B–D paper merchants with stable deposits and manageable stacking. Puerto Rico not funded."},
+  {name:"LCF",minRevenue:0,minTIB:0,minFico:0,maxPositions:99,maxDeal:9999999,badIndustries:[],badStates:[],emails:["support@thelcfgroup.com","underwriting@thelcfgroup.com","closing@thelcfgroup.com","kurt.maimaron@thelcfgroup.com"],term:"Not Specified",commission:"Not Specified",buyRate:"Not Specified",notes:"High-risk files only."},
+  {name:"Silverline",minRevenue:20000,minTIB:5,minFico:500,maxPositions:6,maxDeal:500000,badIndustries:["Auto Sales","Beauty","Digital Marketing"],badStates:["HI","AK","PR"],emails:[],term:"Typically up to 12 months",commission:"Not Specified",buyRate:"Not Specified",notes:"2nd–6th positions and reverses. Settled tax liens/judgements only. Mexico and Canada restricted too."},
+  {name:"Lendini",minRevenue:5000,minTIB:8,minFico:0,maxPositions:99,maxDeal:50000,badIndustries:["Nonprofit"],badStates:["UT","CT","MA"],emails:[],term:"Not Specified",commission:"Not Specified",buyRate:"Not Specified",notes:"Requires 3 monthly deposits, $500 ADB, and limited negative days. Construction requires 5+ years and cannot be 1st position. Hair/skin/nail cap typically $25k."},
+  {name:"Granite Merchant Funding",minRevenue:1000000,minTIB:24,minFico:700,maxPositions:99,maxDeal:2000000,badIndustries:["Financial Services","Auto Sales","Lawyers","Trucking","Real Estate"],badStates:[],emails:["isosupport@granitefunding.com","submissions@granitefunding.com"],term:"Up to 250 days; weekly",commission:"6 pts cap",buyRate:"1.25",notes:"Min advance $750k. Max 5 negative days/month and 5 NSFs/month. Requires 12 most recent business bank statements. Verification via Tax Guard and remote inspection."},
+  {name:"Rapid Finance",minRevenue:10000,minTIB:24,minFico:600,maxPositions:2,maxDeal:600000,badIndustries:["Trucking","Cannabis","Auto Sales","Lawyers"],badStates:["CA","CT","VA"],emails:["Submissions@rapidfinance.com","seancostello@rapidfinance.com","elieshnerson@rapidfinance.com","sabirshrestha@rapidfinance.com","bd@rapidfinance.com"],term:"4–8 months (Type 2) / 15–18 months (Type 1)",commission:"Not Specified",buyRate:"Varies",notes:"Requires 2–4 years TIB depending on product. Max 2 competitor payoffs. NY needs 4 months of bank and processing statements."},
+  {name:"LiquidBee",minRevenue:25000,minTIB:9,minFico:0,maxPositions:4,maxDeal:500000,badIndustries:[],badStates:[],emails:["julia@liquidibee.com","newdeals@liquidibee.com"],term:"4–6 months",commission:"12 Points",buyRate:"As low as 1.33",notes:"Funds all 50 states. Max 5 negative days. No recent defaults. Construction requires stronger revenue and commercial receivables only. High-risk trucking possible with stronger revenue."},
+  {name:"Lynks",minRevenue:0,minTIB:0,minFico:0,maxPositions:99,maxDeal:9999999,badIndustries:["Lawyers","Trucking","Auto Sales","Gambling","Real Estate","Construction"],badStates:["TX","NY","CA"],emails:[],term:"Not Specified",commission:"Not Specified",buyRate:"Not Specified",notes:"Does not fund collection agencies, attorneys, trucking, funeral homes, auto sales, gambling, real estate, gas stations without convenience stores, and home-based construction businesses."},
+  {name:"Splash",minRevenue:20000,minTIB:9,minFico:500,maxPositions:99,maxDeal:100000,badIndustries:["Trucking","Auto Sales","Financial Services","Lawyers"],badStates:["CT","TX","UT","VA"],emails:[],term:"2–10 months",commission:"12 Points",buyRate:"Not Specified",notes:"Prior MCA payment history preferred. 1st positions heavily contingent on credit."},
+  {name:"SuperFast Capital",minRevenue:50000,minTIB:12,minFico:550,maxPositions:4,maxDeal:2000000,badIndustries:["Nonprofit","Trucking","Lawyers","Property Management","CBD","Cannabis","Vape"],badStates:[],emails:["Nicole@superfastcap.com","Lauren@superfastcap.com"],term:"Up to 9 months",commission:"10 Points",buyRate:"Not Specified",notes:"Construction generally needs $250k minimum revenue."},
+  {name:"NEXI",minRevenue:25000,minTIB:12,minFico:525,maxPositions:8,maxDeal:5000000,badIndustries:["Debt Collection","Financial Services","Nonprofit","Firearms","Gambling","Cannabis"],badStates:[],emails:[],term:"3–15 months / up to 450 days for Platinum Reverse",commission:"Not Specified",buyRate:"1.24–1.50",notes:"Traditional up to 2 existing advances; up to 8 for reverse consolidations. Construction and trucking have tighter special rules."},
+  {name:"OnDeck",minRevenue:10000,minTIB:12,minFico:675,maxPositions:99,maxDeal:250000,badIndustries:["Adult Entertainment","Gambling","Financial Services"],badStates:[],emails:[],term:"Up to 24 months",commission:"Not Specified",buyRate:"As low as 1.14",notes:"Restricted industries generally include adult entertainment, illegal businesses, gambling-related businesses, and certain financial services."},
+  {name:"Headway Capital (LOC)",minRevenue:5000,minTIB:6,minFico:675,maxPositions:99,maxDeal:100000,badIndustries:[],badStates:["AR","CT","MI","MT","ND","NV","RI","SD","VT"],emails:[],term:"12, 18 and 24 months",commission:"Not Specified",buyRate:"Not Specified",notes:"Monthly payments by default. Weekly payments available on request. Some entity restrictions apply in DE, ME, MN, NE, NJ, WV and WY."},
+  {name:"Torro Funding",minRevenue:20000,minTIB:6,minFico:500,maxPositions:10,maxDeal:100000,badIndustries:["Trucking","Financial Services","Auto Sales"],badStates:["NY"],emails:["matt.jump@torro.com"],term:"2–9 months",commission:"1.55 sell rate for 15k and under / 1.49 otherwise",buyRate:"Not Specified",notes:"FICO 500+. NY restricted."},
+  {name:"Wynwood Capital Group",minRevenue:30000,minTIB:12,minFico:0,maxPositions:9,maxDeal:4000000,badIndustries:["Financial Services"],badStates:[],emails:["submissions@wynwoodcapitalgroup.com","Josh@wynwoodcapitalgroup.com"],term:"Up to 160 days",commission:"Not Specified",buyRate:"1.37–1.499",notes:"For CA and NY, revenue generally needs $100k; for TX, $120k. Defaults accepted. Requires MCA history and about $1,000 ADB with max 5 negative days/month. 1st only with MCA history."}
+];
+
+const industryAliasMap = {
+  "Retail":["Retail"],
+  "Restaurant":["Restaurant"],
+  "Construction":["Construction"],
+  "Trucking":["Trucking","Transportation"],
+  "Auto Sales":["Auto Sales","Auto Dealerships"],
+  "Medical":["Medical","Doctors","Dentists"],
+  "Professional Services":["Lawyers","Attorneys","Professional Services"],
+  "Beauty":["Beauty","Nail Salons"],
+  "Wholesale":["Wholesale"],
+  "Ecommerce":["Ecommerce"],
+  "Financial Services":["Financial Services","Crypto","Debt Collection","Investment Firms"],
+  "Real Estate":["Real Estate"],
+  "Nonprofit":["Nonprofit","Religious Institutions"],
+  "Other":["Other"]
+};
+
+document.getElementById('totalCount').textContent = funders.length;
+
+function formatMoney(value){
+  if(!Number.isFinite(value) || value >= 9999999) return 'Not specified';
+  return '$' + value.toLocaleString();
+}
+
+function normalizeState(value){
+  return String(value || '').trim().toUpperCase();
+}
+
+function industryMatchesRestricted(selectedIndustry, restrictedList){
+  const aliases = industryAliasMap[selectedIndustry] || [selectedIndustry];
+  return aliases.some(alias => restrictedList.includes(alias));
+}
+
+function computeMatch(funder, merchant){
+  const reasons = [];
+  let eligible = true;
+
+  if(merchant.revenue < funder.minRevenue){ eligible = false; reasons.push('Revenue too low'); }
+  if(merchant.tib < funder.minTIB){ eligible = false; reasons.push('Time in business too low'); }
+  if(merchant.fico < funder.minFico){ eligible = false; reasons.push('Credit score too low'); }
+  if(merchant.positions > funder.maxPositions){ eligible = false; reasons.push('Too many positions'); }
+  if(merchant.amount > funder.maxDeal){ eligible = false; reasons.push('Deal size too large'); }
+  if(funder.badStates.includes(merchant.state)){ eligible = false; reasons.push('State restricted'); }
+  if(industryMatchesRestricted(merchant.industry, funder.badIndustries)){ eligible = false; reasons.push('Industry restricted'); }
+
+  return { eligible, reasons };
+}
+
+function showDetails(name){
+  const funder = funders.find(f => f.name === name);
+  if(!funder) return;
+
+  const existing = document.getElementById('funderModalBackdrop');
+  if(existing) existing.remove();
+
+  const emailList = funder.emails.length
+    ? funder.emails.map(email => `<div>${email}</div>`).join('')
+    : '<div class="small-muted">No direct emails listed for this funder.</div>';
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-backdrop';
+  modal.id = 'funderModalBackdrop';
+  modal.innerHTML = `
+    <div class="modal-card">
+      <div class="modal-top">
+        <div>
+          <h3>${funder.name}</h3>
+          <div class="modal-sub">Full funder details, restrictions, and submission contacts.</div>
+        </div>
+        <button class="close-btn" onclick="closeModal()">Close</button>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-card"><div class="k">Minimum Monthly Revenue</div><div class="v">${formatMoney(funder.minRevenue)}</div></div>
+        <div class="detail-card"><div class="k">Buy Rate</div><div class="v">${funder.buyRate || 'Not specified'}</div></div>
+        <div class="detail-card"><div class="k">Commission</div><div class="v">${funder.commission || 'Not specified'}</div></div>
+        <div class="detail-card"><div class="k">Term Range</div><div class="v">${funder.term || 'Not specified'}</div></div>
+        <div class="detail-card"><div class="k">Minimum Time In Business</div><div class="v">${funder.minTIB ? funder.minTIB + ' months' : 'Not specified'}</div></div>
+        <div class="detail-card"><div class="k">Minimum Credit Score</div><div class="v">${funder.minFico || 'Not specified'}</div></div>
+        <div class="detail-card"><div class="k">Maximum Positions</div><div class="v">${funder.maxPositions >= 99 ? 'Not specified / flexible' : funder.maxPositions}</div></div>
+        <div class="detail-card"><div class="k">Maximum Deal Size</div><div class="v">${formatMoney(funder.maxDeal)}</div></div>
+        <div class="detail-card"><div class="k">Restricted States</div><div class="v">${funder.badStates.length ? funder.badStates.join(', ') : 'None listed'}</div></div>
+        <div class="detail-card"><div class="k">Restricted Industries</div><div class="v">${funder.badIndustries.length ? funder.badIndustries.join(', ') : 'None listed'}</div></div>
+      </div>
+
+      <div class="detail-card" style="margin-top:18px">
+        <div class="k">Notes</div>
+        <div class="v">${funder.notes || 'No notes listed.'}</div>
+      </div>
+
+      <div class="email-block">
+        <div class="k">Submission Emails</div>
+        <div class="email-list">${emailList}</div>
+        <div class="email-actions">
+          <button class="copy-btn" id="copyEmailsBtn" onclick='copyEmails(${JSON.stringify(funder.emails)})'>Copy Emails</button>
+          <div class="small-muted">Copies emails with spaces only, no commas.</div>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+  document.body.appendChild(modal);
+}
+
+function closeModal(){
+  const modal = document.getElementById('funderModalBackdrop');
+  if(modal) modal.remove();
+}
+
+function copyEmails(emails){
+  if(!emails || !emails.length){ return; }
+  const text = emails.join(' ');
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyEmailsBtn');
+    if(btn){
+      const original = btn.textContent;
+      btn.textContent = 'Copied';
+      setTimeout(() => btn.textContent = original, 1400);
+    }
+  });
+}
+
+function resetForm(){
+  ['revenue','amount','tib','fico','state','positions'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('industry').value = 'Retail';
+  document.getElementById('results').className = 'empty';
+  document.getElementById('results').innerHTML = `
+    <div>
+      <div style="font-size:20px;font-weight:800;color:var(--sea-shell);margin-bottom:8px">Run a merchant search</div>
+      <div>Once you click <b>Find Funders</b>, the portal will return eligible matches and show why a funder did or did not fit.</div>
+    </div>`;
+  document.getElementById('eligibleCount').textContent = '0';
+  document.getElementById('ineligibleCount').textContent = '0';
+  document.getElementById('resultsBadge').textContent = 'No search yet';
+}
+
+function runMatch(){
+  const merchant = {
+    revenue: parseFloat(document.getElementById('revenue').value) || 0,
+    amount: parseFloat(document.getElementById('amount').value) || 0,
+    industry: document.getElementById('industry').value,
+    tib: parseFloat(document.getElementById('tib').value) || 0,
+    fico: parseFloat(document.getElementById('fico').value) || 0,
+    state: normalizeState(document.getElementById('state').value),
+    positions: parseFloat(document.getElementById('positions').value) || 0
+  };
+
+  const eligible = [];
+  const ineligible = [];
+
+  funders.forEach(funder => {
+    const result = computeMatch(funder, merchant);
+    const item = { funder, reasons: result.reasons };
+    if(result.eligible) eligible.push(item); else ineligible.push(item);
+  });
+
+  const resultsHtml = [...eligible, ...ineligible].map(item => {
+    const statusClass = eligible.includes(item) ? 'good' : 'bad';
+    const statusText = eligible.includes(item) ? 'Eligible' : 'Not Eligible';
+    const reasonText = eligible.includes(item)
+      ? 'Click funder name to open full details, notes, and submission emails.'
+      : item.reasons.join(' • ');
+
+    return `
+      <div class="result-card ${statusClass}">
+        <div class="result-top">
+          <button class="linklike" onclick="showDetails(${JSON.stringify(item.funder.name)})">${item.funder.name}</button>
+          <div class="pill ${statusClass}">${statusText}</div>
+        </div>
+        <div class="result-sub">${reasonText}</div>
+        <div class="result-meta">
+          <div class="meta-chip">Min Rev: ${formatMoney(item.funder.minRevenue)}</div>
+          <div class="meta-chip">Min FICO: ${item.funder.minFico || 'N/A'}</div>
+          <div class="meta-chip">Max Pos: ${item.funder.maxPositions >= 99 ? 'Flexible' : item.funder.maxPositions}</div>
+          <div class="meta-chip">Max Deal: ${formatMoney(item.funder.maxDeal)}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('results').className = 'results-list';
+  document.getElementById('results').innerHTML = resultsHtml || '<div class="empty">No results found.</div>';
+  document.getElementById('eligibleCount').textContent = eligible.length;
+  document.getElementById('ineligibleCount').textContent = ineligible.length;
+  document.getElementById('resultsBadge').textContent = `${eligible.length} eligible / ${ineligible.length} not eligible`;
+}
+</script>
+</body>
+</html>
