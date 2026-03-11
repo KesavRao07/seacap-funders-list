@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SeaCap Funder Groups</title>
+
+<style>
+
+body{
+font-family:Inter,system-ui;
+margin:0;
+background:#0c2324;
+color:white;
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+padding:40px;
+}
+
+h1{
+font-size:42px;
+margin-bottom:5px;
+}
+
+.subtitle{
+opacity:.7;
+margin-bottom:40px;
+}
+
+.group{
+background:#102e30;
+padding:25px;
+border-radius:20px;
+margin-bottom:25px;
+}
+
+.group h2{
+margin:0 0 10px 0;
+}
+
+.funders{
+margin:15px 0;
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.funder{
+background:#195455;
+padding:8px 12px;
+border-radius:12px;
+font-size:14px;
+}
+
+button{
+background:#648F89;
+border:none;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
+font-weight:700;
+}
+
+button:hover{
+opacity:.85;
+}
+
+.nav{
+margin-bottom:30px;
+}
+
+.nav a{
+color:#C7D8CD;
+margin-right:20px;
+text-decoration:none;
+font-weight:600;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="nav">
+<a href="index.html">Matcher</a>
+<a href="groups.html">Funder Groups</a>
+</div>
+
+<h1>Funder Routing Groups</h1>
+<p class="subtitle">Copy email blasts for different quality files.</p>
+
+
+<!-- A FILE -->
+
+<div class="group">
+
+<h2>Tier 1 — A File / 1st Position</h2>
+
+<div class="funders">
+<div class="funder">OnDeck</div>
+<div class="funder">Rapid Finance</div>
+<div class="funder">Aspire</div>
+<div class="funder">Jaffe</div>
+<div class="funder">Brickell</div>
+</div>
+
+<button onclick="copyEmails('A')">Copy All Emails</button>
+
+</div>
+
+
+
+<!-- B FILE -->
+
+<div class="group">
+
+<h2>Tier 2 — B File (50k+ revenue / 1-5 positions)</h2>
+
+<div class="funders">
+<div class="funder">CFG</div>
+<div class="funder">Newco</div>
+<div class="funder">Jaffe</div>
+<div class="funder">Lendini</div>
+<div class="funder">Splash</div>
+<div class="funder">Fyncap</div>
+<div class="funder">LiquidBee</div>
+<div class="funder">Cromwell</div>
+<div class="funder">Superfast</div>
+<div class="funder">Instafunders</div>
+<div class="funder">Wynwood</div>
+<div class="funder">Velocity</div>
+</div>
+
+<button onclick="copyEmails('B')">Copy All Emails</button>
+
+</div>
+
+
+
+<!-- C FILE -->
+
+<div class="group">
+
+<h2>Tier 3 — C File (2-5+ positions)</h2>
+
+<div class="funders">
+<div class="funder">Aspire</div>
+<div class="funder">CFG</div>
+<div class="funder">Newco</div>
+<div class="funder">Jaffe</div>
+<div class="funder">Lendini</div>
+<div class="funder">Splash</div>
+<div class="funder">Fyncap</div>
+<div class="funder">LiquidBee</div>
+<div class="funder">Cromwell</div>
+<div class="funder">Superfast</div>
+<div class="funder">Instafunders</div>
+<div class="funder">Wynwood</div>
+<div class="funder">Velocity</div>
+</div>
+
+<button onclick="copyEmails('C')">Copy All Emails</button>
+
+</div>
+
+
+
+<!-- D FILE -->
+
+<div class="group">
+
+<h2>Tier 4 — D File (High Risk)</h2>
+
+<div class="funders">
+<div class="funder">Aspire</div>
+<div class="funder">Zlur</div>
+<div class="funder">LCF</div>
+<div class="funder">Wefi</div>
+<div class="funder">Mint</div>
+<div class="funder">Bitty</div>
+<div class="funder">Splash</div>
+</div>
+
+<button onclick="copyEmails('D')">Copy All Emails</button>
+
+</div>
+
+</div>
+
+
+
+<script>
+
+const emailGroups = {
+
+A:[
+"submissions@aspirefundingplatform.com",
+"submissions@rapidfinance.com",
+"submissions@jaffecapital.com",
+"info@brickellfunding.com"
+],
+
+B:[
+"GGGsubmissions@cfgms.com",
+"submissions@newcocapitalgroup.com",
+"submissions@jaffecapital.com",
+"submissions@lendini.com",
+"teamld@splashadvance.com",
+"submissions@fyncap.com",
+"newdeals@liquidibee.com",
+"team@cromwellcapital.com",
+"submissions@superfastcap.com",
+"instasubs@instafunders.com",
+"submissions@wynwoodcapitalgroup.com",
+"Subs@velocitycg.com"
+],
+
+C:[
+"submissions@aspirefundingplatform.com",
+"GGGsubmissions@cfgms.com",
+"submissions@newcocapitalgroup.com",
+"submissions@jaffecapital.com",
+"submissions@lendini.com",
+"teamld@splashadvance.com",
+"submissions@fyncap.com",
+"newdeals@liquidibee.com",
+"team@cromwellcapital.com",
+"submissions@superfastcap.com",
+"instasubs@instafunders.com",
+"submissions@wynwoodcapitalgroup.com",
+"Subs@velocitycg.com"
+],
+
+D:[
+"submissions@aspirefundingplatform.com",
+"submissions@zlur.com",
+"Submissions@thelcfgroup.com",
+"deals@mintfunding.com",
+"teamld@splashadvance.com"
+]
+
+}
+
+
+function copyEmails(tier){
+
+const emails=emailGroups[tier]
+
+const text=emails.join(" ")
+
+navigator.clipboard.writeText(text)
+
+alert("Emails copied")
+
+}
+
+</script>
+
+</body>
+</html>
